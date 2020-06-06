@@ -27,7 +27,7 @@ process_article () {
     j="$1"
     X=$(( j - (j % 10)))
     #URL="tmp/scholar?start=${X}&q=${query}&hl=en&as_sdt=0,5"
-    ./entry_proc "$j" "tmp/out_${fn}_${X}.html" ${query}| paste -sd "|" >> "$database"
+    ./entry_proc "$j" "tmp/out_${fn}_${X}.html" ${query}| paste -sd "\t" >> "$database"
 }
 export -f process_article
 
