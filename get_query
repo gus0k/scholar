@@ -1,0 +1,35 @@
+#!/bin/bash
+
+MAX=999
+database="data.csv"
+
+query=$(echo "$@" | sed -e "s/\s/\+/g")
+fn=$( echo "$query" | sed -e 's/"/-/g')
+export query
+export fn
+export database
+
+echo "$query"
+
+for i in $(seq 0 10 $MAX); do
+
+    outfile="tmp/out_${fn}_${i}.html"
+    if [ ! -f "$outfile" ]; then
+        URL="https://scholar.google.com/scholar?start=${i}&q=${query}&hl=en&as_sdt=0,5"
+        wget --remote-encoding=UTF-8 -O "$outfile"  -e robots=off -U mozilla --random-wait --wait 3 $URL
+        sleep 1
+    fi
+
+done
+
+process_article () {
+
+    j="$1"
+    X=$(( j - (j % 10)))
+    #URL="tmp/scholar?start=${X}&q=${query}&hl=en&as_sdt=0,5"
+    ./entry_proc "$j" "tmp/out_${fn}_${X}.html" ${query}| paste -sd "|" >> "$database"
+}
+export -f process_article
+
+parallel process_article ::: "$(seq 0 $MAX)"
+
