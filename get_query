@@ -1,6 +1,6 @@
 #!/bin/bash
 
-MAX=999
+MAX=2999
 database="data.csv"
 
 query=$(echo "$@" | sed -e "s/\s/\+/g")
@@ -11,13 +11,15 @@ export database
 
 echo "$query"
 
+useragent="Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1)"
+
 for i in $(seq 0 10 $MAX); do
 
     outfile="tmp/out_${fn}_${i}.html"
     if [ ! -f "$outfile" ]; then
         URL="https://scholar.google.com/scholar?start=${i}&q=${query}&hl=en&as_sdt=0,5"
-        wget --remote-encoding=UTF-8 -O "$outfile"  -e robots=off -U mozilla --random-wait --wait 3 $URL
-        sleep 1
+        wget --keep-session-cookies --save-cookies cookies.txt --remote-encoding=UTF-8 -O "$outfile"  -e robots=off -U "$useragent" --random-wait --wait 3 $URL
+        sleep 3
     fi
 
 done
